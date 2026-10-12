@@ -4,7 +4,7 @@ import dynamic from 'next/dynamic'
 import Header from '../components/Header'
 import Footer from '../components/Footer'
 import ListingCard from '../components/ListingCard'
-import { getListings } from '../data/destinations'
+import { getListings, findDestination } from '../data/destinations'
 
 const Map = dynamic(() => import('../components/Map'), {
   ssr: false,
@@ -111,7 +111,9 @@ export default function Search({ location, startDate, endDate, guests, nights, l
 }
 
 export async function getServerSideProps({ query }) {
-  const location = String(query.location || '').trim().slice(0, 60) || 'London'
+  const typed = String(query.location || '').trim().slice(0, 60) || 'London'
+  // "corn" -> "Cornwall"; unknown places keep what the user typed
+  const location = findDestination(typed)?.name || typed
   const today = new Date()
   const startDate = isDate(query.startDate) ? String(query.startDate).slice(0, 10) : iso(new Date(today.getTime() + 7 * DAY))
   let endDate = isDate(query.endDate) ? String(query.endDate).slice(0, 10) : iso(new Date(Date.parse(startDate) + 3 * DAY))
