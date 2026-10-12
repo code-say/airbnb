@@ -1,46 +1,36 @@
+const columns = [
+  { title: 'Support', items: ['Help Centre', 'Safety information', 'Cancellation options', 'Supporting people with disabilities', 'Report a neighbourhood concern'] },
+  { title: 'Community', items: ['Disaster relief housing', 'Celebrating diversity & belonging', 'Combating discrimination'] },
+  { title: 'Hosting', items: ['Try hosting', 'Protection for hosts', 'Explore hosting resources', 'Community forum', 'Hosting responsibly'] },
+  { title: 'About', items: ['How it works', 'Newsroom', 'Careers', 'Investors'] },
+]
 
-
-function Footer() {
-    return (
-       <div className='grid grid-cols-1 md:grid-cols-4 gap-y-10 px-32 py-14 bg-gray-100 text-gray-600'>
-           <div className='space-y-4 text-xs text-gray-800'>
-               <h5 className='font-bold'>About</h5>
-               <p>How Airbnb works</p>
-               <p>Newsroom</p>
-               <p>Careers</p>
-               <p>Investors</p>
-               <p>Airbnb Luxe</p>
-           </div>
-           
-           <div className='space-y-4 text-xs text-gray-800'>
-               <h5 className='font-bold'>Hosting</h5>
-               <p>Try hosting</p>
-               <p>AirCover: protection for Hosts</p>
-               <p>Explore hosting resources</p>
-               <p>Visit our community forum</p>
-               <p>How to host responsibly</p>
-           </div>
-           
-           <div className='space-y-4 text-xs text-gray-800'>
-               <h5 className='font-bold'>Community</h5>
-               <p>Airbnb.org: disaster relief housing</p>
-               <p>Support Afghan refugees</p>
-               <p>Celebrating diversity & belonging</p>
-               <p>Combating discrimination</p>
-           </div>
-           
-           <div className='space-y-4 text-xs text-gray-800'>
-               <h5 className='font-bold'>Support</h5>
-               <p>Help Centre</p>
-               <p>Safety information</p>
-               <p>Cancellation options</p>
-               <p>Our COVID-19 Response</p>
-               <p>Supporting people with disabilities</p>
-               <p>Report a neighbourhood concern</p>
-           </div>
-       </div>
-
-    );
+export default function Footer() {
+  return (
+    <footer className="mt-12 border-t bg-gray-50 text-gray-700">
+      <div className="mx-auto grid max-w-7xl grid-cols-1 gap-y-8 px-8 py-12 sm:grid-cols-2 sm:px-16 md:grid-cols-4">
+        {columns.map((c) => (
+          <div key={c.title} className="space-y-3 text-sm">
+            <h5 className="font-semibold text-gray-900">{c.title}</h5>
+            {c.items.map((i) => (
+              <p key={i} className="cursor-pointer hover:underline">{i}</p>
+            ))}
+          </div>
+        ))}
+      </div>
+      <div className="border-t">
+        <div className="mx-auto flex max-w-7xl flex-col gap-2 px-8 py-6 text-xs text-gray-500 sm:flex-row sm:justify-between sm:px-16">
+          <p>
+            © {new Date().getFullYear()} Portfolio project by{' '}
+            <a href="https://github.com/code-say" target="_blank" rel="noreferrer" className="underline hover:text-gray-900">Sayan Mandal</a>
+            {' '}· Not affiliated with Airbnb, Inc.
+          </p>
+          <p>
+            Photos from <a href="https://unsplash.com" target="_blank" rel="noreferrer" className="underline hover:text-gray-900">Unsplash</a>
+            {' '}· <a href="https://github.com/code-say/airbnb" target="_blank" rel="noreferrer" className="underline hover:text-gray-900">Source on GitHub</a>
+          </p>
+        </div>
+      </div>
+    </footer>
+  )
 }
-
-export default Footer

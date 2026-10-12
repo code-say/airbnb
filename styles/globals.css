@@ -1,0 +1,42 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html { -webkit-font-smoothing: antialiased; }
+  body { @apply bg-white text-gray-900; }
+}
+
+@layer components {
+  .chip {
+    @apply whitespace-nowrap rounded-full border border-gray-300 px-4 py-2 text-sm transition
+      hover:border-gray-900 active:scale-95;
+  }
+  .chip-active {
+    @apply border-gray-900 bg-gray-900 text-white;
+  }
+}
+
+@layer utilities {
+  .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+  .scrollbar-hide::-webkit-scrollbar { display: none; }
+}
+
+/* Leaflet price markers */
+.price-pin {
+  background: #fff;
+  border-radius: 9999px;
+  padding: 4px 10px;
+  font: 600 13px/1.2 Inter, system-ui, sans-serif;
+  color: #222;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+  white-space: nowrap;
+  transform: translate(-50%, -50%);
+  display: inline-block;
+  transition: transform 0.15s ease, background 0.15s ease;
+}
+.price-pin.active { background: #222; color: #fff; transform: translate(-50%, -50%) scale(1.12); }
+.leaflet-div-icon.pin-wrap { background: none; border: 0; }
+.leaflet-container { font-family: Inter, system-ui, sans-serif; }
+.leaflet-popup-content { margin: 0; }
+.leaflet-popup-content-wrapper { padding: 0; overflow: hidden; border-radius: 14px; }

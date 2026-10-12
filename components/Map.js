@@ -1,77 +1,68 @@
-import { useState } from 'react';
-import ReactMapGL, {Marker, Popup} from 'react-map-gl';
-import getCenter from "geolib/es/getCenter";
+import { useEffect, useRef } from 'react'
+import { unsplash } from '../data/destinations'
 
-function Map({searchResults}) {
+// Leaflet + OpenStreetMap: no API key needed. Leaflet touches `window`, so it is
+// imported inside the effect and this component is loaded with ssr: false.
+export default function Map({ listings, activeId, onSelect }) {
+  const elRef = useRef(null)
+  const mapRef = useRef(null)
+  const markersRef = useRef({})
 
-    const [selectedLocation, setSelectedLocation ] = useState({});
+  useEffect(() => {
+    let cancelled = false
+    let map
+    import('leaflet').then((mod) => {
+      const L = mod.default || mod
+      if (cancelled || !elRef.current) return
+      map = L.map(elRef.current, { scrollWheelZoom: true, zoomControl: true })
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+      }).addTo(map)
 
-    // Trnasform the search object into the
-    // {latitude: 52.516272, longitude: 13.377722 }
-    //object
+      const bounds = []
+      listings.forEach((l) => {
+        const icon = L.divIcon({
+          className: 'pin-wrap',
+          html: `<span class="price-pin" data-id="${l.id}">£${l.price}</span>`,
+          iconSize: [0, 0],
+        })
+        const marker = L.marker([l.lat, l.lng], { icon, title: l.title, riseOnHover: true }).addTo(map)
+        marker.bindPopup(
+          `<div style="width:220px">
+             <img src="${unsplash(l.img, 440, 260)}" alt="" style="width:100%;height:130px;object-fit:cover;display:block"/>
+             <div style="padding:10px 12px">
+               <div style="font-weight:600;font-size:14px;margin-bottom:2px">${l.title}</div>
+               <div style="color:#6b7280;font-size:12px">★ ${l.rating.toFixed(2)} · £${l.price} night</div>
+             </div>
+           </div>`,
+          { closeButton: false, offset: [0, -8] }
+        )
+        marker.on('click', () => onSelect?.(l.id))
+        markersRef.current[l.id] = marker
+        bounds.push([l.lat, l.lng])
+      })
+      if (bounds.length) map.fitBounds(bounds, { padding: [40, 40] })
+      mapRef.current = map
+    })
 
-    const coordinates = searchResults.map(result => ({
-        longitude: result.long,
-        latitude: result.lat,
-    }));
+    return () => {
+      cancelled = true
+      markersRef.current = {}
+      if (map) map.remove()
+      mapRef.current = null
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [listings])
 
-//  The latitude and longitude of the center of locations coordinates
-    const center = getCenter(coordinates);
+  // Highlight the marker for the listing being hovered in the list
+  useEffect(() => {
+    Object.entries(markersRef.current).forEach(([id, m]) => {
+      const el = m.getElement()?.querySelector('.price-pin')
+      if (el) el.classList.toggle('active', id === activeId)
+      m.setZIndexOffset(id === activeId ? 1000 : 0)
+    })
+  }, [activeId])
 
-
-    const [viewport, setViewport] = useState({
-        width: '100%',
-        height: '100%',
-        latitude: center.latitude, 
-        longitude: center.longitude,
-        zoom: 11,
-    });
-
-    return (
-        <ReactMapGL
-        mapStyle='mapbox://styles/codesay/ckvvzpjxc0z9914pcyvqjyzy2'
-        mapboxApiAccessToken={process.env.mapbox_key}
-
-        {...viewport}
-        onViewportChange={nextViewport => setViewport(nextViewport)}
-
-        >
-        {searchResults.map((result) => (
-            <div key={result.long}>
-                <Marker
-                    longitude={result.long}
-                    latitude={result.lat}
-                    offsetLeft={-20}
-                    offsetTop={-10}
-                >
-                    <p
-                        role="img"
-                        onClick={() => setSelectedLocation(result)}
-                        className="cursor-pointer text-2xl animate-bounce"
-                        aria-label="push-pin"
-                    
-                    >📌</p>
-                </Marker>
-
-                {/* The popup thata should show if we click on a marker*/}
-                {selectedLocation.long === result.long ? (
-                    <Popup
-                        onClose={() => setselectedLocation({})}
-                        closeOnClick={true}
-                        latitude={result.lat}
-                        longitude={result.long}
-                    >
-                        {result.title}
-                    </Popup>
-                ):(
-                    false
-                )}
-            </div>
-        ))}
-        
-        
-        </ReactMapGL>
-    );
+  return <div ref={elRef} className="h-full w-full" aria-label="Map of listings" />
 }
-
-export default Map

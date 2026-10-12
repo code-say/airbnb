@@ -1,124 +1,99 @@
-import Image from 'next/image';
-import { SearchIcon, MenuIcon, UserIcon, UsersIcon, GlobeAltIcon  } from '@heroicons/react/solid';
-import { useState } from "react";
-import 'react-date-range/dist/styles.css'; //main style file
-import 'react-date-range/dist/theme/default.css'; // theme css file
-import { DateRangePicker } from 'react-date-range';
-import { useRouter } from "next/dist/client/router";
+import { useEffect, useRef, useState } from 'react'
+import { useRouter } from 'next/router'
+import { MagnifyingGlassIcon, GlobeAltIcon, Bars3Icon, UserCircleIcon } from '@heroicons/react/24/solid'
+import Logo from './Logo'
+import SearchPanel from './SearchPanel'
 
-function Header({placeholder}) {
+const toISODate = (d) => d.toISOString().slice(0, 10)
+const addDays = (d, n) => new Date(d.getTime() + n * 86400000)
 
-    const [searchInput, setSearchInput] = useState("");
-    const [startDate, setStartDate] = useState(new Date());
-    const [endDate, setEndDate] = useState(new Date());
-    const [noOfGuests, setNoOfGuests] = useState(1);
-    const router = useRouter();
+export default function Header({ placeholder, initial = {} }) {
+  const router = useRouter()
+  const today = new Date()
+  const [location, setLocation] = useState(initial.location || '')
+  const [startDate, setStartDate] = useState(initial.startDate || toISODate(addDays(today, 7)))
+  const [endDate, setEndDate] = useState(initial.endDate || toISODate(addDays(today, 10)))
+  const [guests, setGuests] = useState(Number(initial.guests) || 2)
+  const [open, setOpen] = useState(false)
+  const [scrolled, setScrolled] = useState(false)
+  const wrapRef = useRef(null)
 
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 8)
+    onScroll()
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
 
-    const handleSelect = (ranges) => {
-        setStartDate(ranges.selection.startDate);
-        setEndDate(ranges.selection.endDate);
+  useEffect(() => {
+    if (!open) return
+    const onDown = (e) => wrapRef.current && !wrapRef.current.contains(e.target) && setOpen(false)
+    const onKey = (e) => e.key === 'Escape' && setOpen(false)
+    document.addEventListener('mousedown', onDown)
+    document.addEventListener('keydown', onKey)
+    return () => {
+      document.removeEventListener('mousedown', onDown)
+      document.removeEventListener('keydown', onKey)
     }
+  }, [open])
 
-    const resetInput = () => {
-        setSearchInput('');
-    }
+  const search = (loc = location) => {
+    const where = loc.trim() || 'London'
+    setOpen(false)
+    router.push({ pathname: '/search', query: { location: where, startDate, endDate, guests } })
+  }
 
-    const search = () => {
-        router.push({
-            pathname: "/search",
-            query:{
-                location: searchInput,
-                startDate: startDate.toISOString(),
-                endDate: endDate.toISOString(),
-                noOfGuests,
-            },
-        });
-    }
+  return (
+    <header
+      ref={wrapRef}
+      className={`sticky top-0 z-50 bg-white transition-shadow ${scrolled || open ? 'shadow-md' : 'border-b border-gray-100'}`}
+    >
+      <div className="mx-auto grid max-w-7xl grid-cols-[auto_1fr_auto] items-center gap-4 px-4 py-4 sm:px-8">
+        <Logo />
 
-    const selectionRange = {
-        startDate: startDate,
-        endDate: endDate,
-        key: 'selection',
-    };
+        <form
+          role="search"
+          onSubmit={(e) => { e.preventDefault(); search() }}
+          className="mx-auto flex w-full max-w-md items-center rounded-full border border-gray-200 py-1.5 pl-5 pr-1.5 shadow-sm transition hover:shadow-md"
+        >
+          <input
+            value={location}
+            onChange={(e) => setLocation(e.target.value)}
+            onFocus={() => setOpen(true)}
+            className="min-w-0 flex-grow bg-transparent text-sm text-gray-700 outline-none placeholder:text-gray-500"
+            type="text"
+            placeholder={placeholder || 'Where are you going?'}
+            aria-label="Destination"
+          />
+          <button type="submit" aria-label="Search" className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-brand text-white transition hover:bg-brand-dark">
+            <MagnifyingGlassIcon className="h-4 w-4" />
+          </button>
+        </form>
 
-    
+        <div className="flex items-center justify-end gap-2 text-gray-600">
+          <span className="hidden cursor-pointer rounded-full px-3 py-2 text-sm font-medium hover:bg-gray-100 md:inline">Become a host</span>
+          <GlobeAltIcon className="hidden h-9 w-9 cursor-pointer rounded-full p-2 hover:bg-gray-100 sm:block" aria-hidden="true" />
+          <div className="flex cursor-pointer items-center gap-2 rounded-full border border-gray-200 py-1 pl-3 pr-1 transition hover:shadow-md">
+            <Bars3Icon className="h-5 w-5" aria-hidden="true" />
+            <UserCircleIcon className="h-8 w-8 text-gray-500" aria-hidden="true" />
+          </div>
+        </div>
+      </div>
 
-
-    return (
-        <header className='sticky top-0 z-50 grid 
-        grid-cols-3 bg-white shadow-md p-5 md:px-10'>
-            {/* Left */}
-            <div 
-            onClick={() => router.push("/")}
-            className='relative flex items-center h-10 cursor-pointer my-auto'>
-                <Image src="https://links.papareact.com/qd3" 
-                    layout='fill'
-                    objectFit='contain'
-                    objectPosition='left'
-                />
-            </div>
-
-            {/* Middle-search */}
-            <div className='flex items-center md:border-2 rounded-full py-2 md:shadow-sm'>
-                <input
-                value = {searchInput}
-                onChange={(e) => setSearchInput(e.target.value)}
-                className="flex-grow pl-5 bg-transparent outline-none text-sm text-gray-600 placeholder-gray-400"
-                type="text"
-                placeholder={placeholder || "Start your search"}
-                />
-                <SearchIcon className="hidden md:inline-flex 
-                h-8 bg-red-400
-                text-white rounded-full p-2 cursor-pointer md:mx-2" />
-            </div>
-
-            {/*Right*/}
-            <div className="flex items-center space-x-4 justify-end
-            text-gray-500">
-                <p className="hidden md:inline cursor-pointer">Become a host</p>
-                <GlobeAltIcon className="h-6 cursor-pointer" />
-
-                <div className="flex items-center space-x-2 border-2
-                p-2 rounded-full">
-                    <MenuIcon className="h-6 cursor-pointer" />
-                    <UserIcon className="h-6 cursor-pointer" />
-                </div>
-            </div>
-
-            {searchInput &&  (
-                <div className='flex flex-col col-span-3 mx-auto mt-10'>
-                    <DateRangePicker ranges={[selectionRange]} 
-                    minDate={new Date()}
-                    rangeColors={["#FD5B61"]}
-                    onChange={handleSelect}
-                    />
-                    <div className='flex items-center border-b mb-4'>
-                        <h2 className='text-2xl flex-grow 
-                        font-semibold'>Number of Guests</h2>
-
-                        <UsersIcon className="h-5" />
-                        <input 
-                        value={noOfGuests}
-                        onChange={(e) => setNoOfGuests(e.target.value)}
-                        type="number" 
-                        min={1}
-                        className='w-12 pl-2 text-lg 
-                        outline-none text-red-400 ' />
-                    </div>
-                    {/* Emmet for react */}
-                    <div className='flex'>
-                    <button 
-                    onClick={resetInput}
-                    className='flex-grow text-gray-500'>Cancel</button>
-                    <button 
-                    onClick={search}
-                    className='flex-grow text-red-400'>Search</button>
-                    </div>
-                </div>
-            )}
-        </header>
-    )
+      {open && (
+        <SearchPanel
+          location={location}
+          setLocation={setLocation}
+          startDate={startDate}
+          setStartDate={setStartDate}
+          endDate={endDate}
+          setEndDate={setEndDate}
+          guests={guests}
+          setGuests={setGuests}
+          onSearch={search}
+          onCancel={() => setOpen(false)}
+        />
+      )}
+    </header>
+  )
 }
-
-export default Header

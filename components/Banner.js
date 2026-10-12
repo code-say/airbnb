@@ -1,23 +1,28 @@
-import Image from "next/image";
+import Image from 'next/image'
+import Link from 'next/link'
+import { unsplash, HERO_IMG } from '../data/destinations'
 
-function Banner() {
-    return (
-        <div className='relative h-[300px] sm:h-[400px] lg:h-[500px] xl:h-[600px] 2xl:h-[700px]'>
-            <Image 
-                src="https://links.papareact.com/0fm"
-                layout='fill'
-                objectFit="cover"
-            />
-            <div className="absolute top-1/2 w-full text-center">
-                <p className='text-sm sm:text-lg'>Not sure where to go? Perfect.</p>
-
-                <button className='text-purple-500 bg-white px-10 py-4 shadow-md rounded-full font-bold my-3 hover:shadow-xl
-                active:scale-90 transition duration-150'>
-                    I'm flexible
-                </button>
-            </div>
-        </div>
-    )
+export default function Banner() {
+  return (
+    <section className="relative h-[340px] sm:h-[440px] lg:h-[540px] xl:h-[620px]">
+      <Image
+        src={unsplash(HERO_IMG, 2000)}
+        alt="Valley between forested mountains at sunrise"
+        fill
+        priority
+        sizes="100vw"
+        className="object-cover"
+      />
+      <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-black/10 to-black/40" />
+      <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 px-4 text-center text-white">
+        <p className="text-sm font-medium drop-shadow sm:text-lg">Not sure where to go? Perfect.</p>
+        <Link
+          href="/search?location=Lake%20District"
+          className="mt-4 inline-block rounded-full bg-white px-10 py-4 font-bold text-purple-600 shadow-md transition duration-150 hover:shadow-xl active:scale-95"
+        >
+          I&apos;m flexible
+        </Link>
+      </div>
+    </section>
+  )
 }
-
-export default Banner

@@ -1,29 +1,44 @@
-# Next.js + Tailwind CSS Example
+# Airbnb Clone
 
-This example shows how to use [Tailwind CSS](https://tailwindcss.com/) [(v2.2)](https://blog.tailwindcss.com/tailwindcss-2-2) with Next.js. It follows the steps outlined in the official [Tailwind docs](https://tailwindcss.com/docs/guides/nextjs).
+A responsive Airbnb-style stays search built with **Next.js 15**, **React 19** and **Tailwind CSS**.
 
-It uses the new [`Just-in-Time Mode`](https://tailwindcss.com/docs/just-in-time-mode) for Tailwind CSS.
+**Live:** https://airbnbcode.vercel.app
 
-## Preview
+> Portfolio project by Sayan Mandal. Not affiliated with Airbnb, Inc.
 
-Preview the example live on [StackBlitz](http://stackblitz.com/):
+## Features
 
-[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/github/vercel/next.js/tree/canary/examples/with-tailwindcss)
+- Home page with hero banner, "Explore nearby" destinations, "Live anywhere" categories and an inspiration card
+- Search bar with destination suggestions, check-in / check-out dates and a guest counter
+- Server-rendered search results (`getServerSideProps`) with nights and total price worked out from your dates
+- Filter chips (type of place, price, Superhost) and sorting by price or rating
+- Interactive OpenStreetMap map (Leaflet, no API key) with price markers that highlight as you hover listings
+- Route-change progress bar, mobile-friendly layout, optimized images via `next/image`
 
-## Deploy your own
+## What changed in v2 (2026)
 
-Deploy the example using [Vercel](https://vercel.com?utm_source=github&utm_medium=readme&utm_campaign=next-example):
+The 2023 version broke in several ways:
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/git/external?repository-url=https://github.com/vercel/next.js/tree/canary/examples/with-tailwindcss&project-name=with-tailwindcss&repository-name=with-tailwindcss)
+- The search page 404'd (`FUNCTION_RUNTIME_DEPRECATED`) because it ran on a Node version Vercel has retired
+- `"next": "latest"` pulled a Next.js release incompatible with React 17, so new deploys failed
+- Listing data and images came from a tutorial host whose links are dying
+- The map relied on a personal Mapbox token and `react-map-gl` v6; the date picker didn't support modern React
 
-## How to use
+v2 pins Next.js 15 / React 19 / Tailwind 3 on Node 22, moves all data into `data/destinations.js` with Unsplash photos, swaps Mapbox for Leaflet + OpenStreetMap, replaces the date picker with native date inputs, and fixes the search page crashing when dates were missing.
 
-Execute [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app) with [npm](https://docs.npmjs.com/cli/init) or [Yarn](https://yarnpkg.com/lang/en/docs/cli/create/) to bootstrap the example:
+## Run locally
 
 ```bash
-npx create-next-app --example with-tailwindcss with-tailwindcss-app
-# or
-yarn create next-app --example with-tailwindcss with-tailwindcss-app
+npm install
+npm run dev     # http://localhost:3000
 ```
 
-Deploy it to the cloud with [Vercel](https://vercel.com/new?utm_source=github&utm_medium=readme&utm_campaign=next-example) ([Documentation](https://nextjs.org/docs/deployment)).
+## Structure
+
+```
+pages/        index (home), search (SSR results), _app, _document
+components/   Header, SearchPanel, Banner, cards, ListingCard, Map, Footer
+data/         destinations, categories and listing generator
+```
+
+Photos from [Unsplash](https://unsplash.com). Map data © OpenStreetMap contributors.

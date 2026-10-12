@@ -1,89 +1,50 @@
-import Head from 'next/head';
-import Banner from '../components/Banner';
-import Footer from '../components/Footer';
-import Header from '../components/Header';
-import LargeCard from '../components/LargeCard';
-import MediumCard from '../components/MediumCard';
-import SmallCard from '../components/SmallCard';
+import Head from 'next/head'
+import Header from '../components/Header'
+import Banner from '../components/Banner'
+import Footer from '../components/Footer'
+import { SmallCard, MediumCard, LargeCard } from '../components/Cards'
+import { destinations, categories, OUTDOORS_IMG } from '../data/destinations'
 
-
-export default function Home({ exploreData, cardsData}) {
+export default function Home() {
   return (
-    <div className="">
+    <>
       <Head>
-        <title>Airbnb-Say</title>
-        <link rel="icon" href="/favicon.ico" />
+        <title>Airbnb Clone · Sayan Mandal</title>
+        <meta name="description" content="An Airbnb-style stays search built with Next.js 15, React 19, Tailwind CSS and Leaflet. Portfolio project by Sayan Mandal." />
       </Head>
 
-      {/* Header */}
       <Header />
-      {/* Banner */}
       <Banner />
 
-      <main className="max-w-7xl mx-auto px-8 sm:px-16">
-        <section className="pt-6">
-          <h2 className="text-4xl font-semibold pb-5">
-            Explore Nearby
-          </h2>
-
-          {/* Pull some data from a server - API endpoints */}
-          <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'>
-          {exploreData?.map((item) => (
-            <SmallCard
-            key={item.img}
-              img={item.img}
-              distance={item.distance}
-              location={item.location}
-            />
-          ))}
+      <main className="mx-auto max-w-7xl px-6 sm:px-16">
+        <section className="pt-10">
+          <h2 className="pb-5 text-3xl font-semibold sm:text-4xl">Explore nearby</h2>
+          <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {destinations.map((d) => (
+              <SmallCard key={d.slug} {...d} />
+            ))}
           </div>
         </section>
 
         <section>
-          <h2 className='text-4xl font-semibold py-8'>
-            Live Anywhere
-          </h2>
+          <h2 className="py-8 text-3xl font-semibold sm:text-4xl">Live anywhere</h2>
+          <div className="scrollbar-hide -ml-3 flex snap-x gap-4 overflow-x-auto p-3">
+            {categories.map((c) => (
+              <MediumCard key={c.title} {...c} />
+            ))}
+          </div>
+        </section>
 
-            <div className='flex space-x-3 overflow-scroll
-             scrollbar-hide p-3 -ml-3'>
-            {cardsData?.map(({img, title}) => (
-            <MediumCard 
-              key={img}
-              img={img}
-              title={title}
-            />
-          ))}
-            </div>
-          </section>
-
-
-          <LargeCard
-          img='https://links.papareact.com/4cj' 
-          title='The Graetest Outdoors'
-          description='Wishlists curated by Airbnb.'
-          buttonText='Get Inspired'
-          />
+        <LargeCard
+          img={OUTDOORS_IMG}
+          title="The Greatest Outdoors"
+          description="Cabins, lakes and mountain hideaways, hand-picked for slow weekends."
+          buttonText="Get inspired"
+          href="/search?location=Lake%20District"
+        />
       </main>
+
       <Footer />
-    </div>
-  );
-}
-
-export async function getStaticProps() {
-  const exploreData = await fetch('https://links.papareact.com/pyp').
-  then ((res) => res.json()
-  );
-
-
-  const cardsData = await fetch('https://links.papareact.com/zp1').
-  then((res) => 
-  res.json()
-  );
-
-  return {
-    props: {
-      exploreData, 
-      cardsData
-    },
-  };
+    </>
+  )
 }

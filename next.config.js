@@ -1,8 +1,7 @@
+/** @type {import('next').NextConfig} */
 module.exports = {
-    images: {
-        domains: ['links.papareact.com'],
-    },
-    env:{
-        mapbox_key: 'pk.eyJ1IjoiY29kZXNheSIsImEiOiJja3Z0NXBjODgwamxzMm5rM3hkNzY5eHFnIn0.V-EVMOQ7xKiz1D2GxJwB-g'
-    }
-};
+  reactStrictMode: true,
+  images: {
+    remotePatterns: [{ protocol: 'https', hostname: 'images.unsplash.com' }],
+  },
+}
