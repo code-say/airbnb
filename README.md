@@ -28,6 +28,8 @@ v2 pins Next.js 15 / React 19 / Tailwind 3 on Node 22, moves all data into `data
 
 ## Run locally
 
+Requires **Node.js 22** (see `.nvmrc`; run `nvm use` if you use nvm).
+
 ```bash
 npm install
 npm run dev     # http://localhost:3000
